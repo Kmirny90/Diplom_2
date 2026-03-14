@@ -16,8 +16,8 @@ class TestCreateUser:
         assert response.status_code == 200
 
     @allure.title("Создание уже существующего пользователя")
-    def test_create_existing_user(self, registered_user):
-        response = requests.post(Endpoints.REGISTER, json=registered_user)
+    def test_create_existing_user(self, created_user):
+        response = requests.post(Endpoints.REGISTER, json=created_user)
 
         assert response.status_code == 403
         assert response.json()["message"] == ERROR_MESSAGES["user_exists"]

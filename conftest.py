@@ -5,21 +5,38 @@ from data.urls import Endpoints
 
 
 @pytest.fixture
-def registered_user():
+def random_user():
 
-    user_data = generate_user_data()
-    requests.post(Endpoints.REGISTER, json=user_data)
-    return user_data
+    return generate_user_data()
 
 
 @pytest.fixture
-def auth_token(registered_user):
+def created_user(random_user):
+
+    response = requests.post(Endpoints.REGISTER, json=random_user)
+    user_data = response.json()
+
+    user_info = {
+        **random_user,
+        "accessToken": user_data.get("accessToken")
+    }
+
+    yield user_info
+
+
+    if user_info.get("accessToken"):
+        headers = {"Authorization": user_info["accessToken"]}
+        requests.patch(Endpoints.USER, headers=headers)
+
+
+@pytest.fixture
+def auth_token(created_user):
 
     response = requests.post(
         Endpoints.LOGIN,
         json={
-            "email": registered_user["email"],
-            "password": registered_user["password"]
+            "email": created_user["email"],
+            "password": created_user["password"]
         }
     )
     return response.json()["accessToken"]
