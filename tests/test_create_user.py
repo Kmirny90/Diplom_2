@@ -6,14 +6,16 @@ from data.urls import Endpoints
 from data.user_data import ERROR_MESSAGES
 
 
+
 class TestCreateUser:
 
     @allure.title("Создание уникального пользователя")
-    def test_create_unique_user(self):
+    def test_create_unique_user(self, user_cleanup):
         user_data = generate_user_data()
         response = requests.post(Endpoints.REGISTER, json=user_data)
 
         assert response.status_code == 200
+        user_cleanup.append(user_data)
 
     @allure.title("Создание уже существующего пользователя")
     def test_create_existing_user(self, created_user):
